@@ -81,7 +81,7 @@ def save_s_data(s_ArrSelected,varName):
 t_save_start=datetime.now()
 startingfileIndTmp=5
 sweep_to_writeTmp=100
-sweep_multiple=43
+sweep_multiple=73
 lagTmp=15
 varName="s"
 
