@@ -20,11 +20,14 @@ row=0
 
 init_path=0
 
+# for row 0
+# T_vec1=[10+n*0.2 for n in range(0,6)]+[11.6,11.7,11.8,11.9,12,12.1,12.2,12.4,12.6,12.8]
+# T_vec2=[11.3 + n*0.02 for n in range(0,11)]
+# T_vec3=[20,50,80]
+# TVals=T_vec2+T_vec3
 
-T_vec1=[10+n*0.2 for n in range(0,6)]+[11.6,11.7,11.8,11.9,12,12.1,12.2,12.4,12.6,12.8]
-T_vec2=[11.3 + n*0.02 for n in range(0,11)]
-T_vec3=[20,50,80]
-TVals=T_vec2+T_vec3
+T_vec1=[0.5+0.1*n for n in range(0,16)]
+TVals=T_vec1
 
 
 TStrAll=[]
