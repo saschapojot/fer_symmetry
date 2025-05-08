@@ -14,7 +14,7 @@ import pickle
 # for s
 
 
-if (len(sys.argv)!=5):
+if (len(sys.argv)!=9):
     print("wrong number of arguments")
     exit()
 
@@ -22,6 +22,11 @@ N=int(sys.argv[1])
 TStr=sys.argv[2]
 init_path=sys.argv[3]
 row=sys.argv[4]
+startingfileIndTmp=int(sys.argv[5])
+sweep_to_writeTmp=int(sys.argv[6])
+
+lagTmp=int(sys.argv[7])
+sweep_multiple=int(sys.argv[8])
 dataRoot=f"./dataAll/N{N}/row{row}/T{TStr}/init_path{init_path}/"
 
 csv_out_path=f"./dataAll/N{N}/row{row}/csvOut_init_path{init_path}/T{TStr}/"
@@ -79,12 +84,12 @@ def save_s_data(s_ArrSelected,varName):
 
 
 t_save_start=datetime.now()
-startingfileIndTmp=50
-sweep_to_writeTmp=1000
+# startingfileIndTmp=50
+# sweep_to_writeTmp=1000
 
-lagTmp=60
+# lagTmp=60
 varName="s"
-sweep_multiple=3
+# sweep_multiple=3
 s_ArrSelected=s_extract_ForOneT(startingfileIndTmp,lagTmp,varName,sweep_to_writeTmp)
 
 save_s_data(s_ArrSelected,varName)

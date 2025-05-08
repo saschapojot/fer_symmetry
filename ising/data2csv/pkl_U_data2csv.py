@@ -11,7 +11,7 @@ import pickle
 
 #this script extracts effective data from pkl files
 # for U
-if (len(sys.argv)!=5):
+if (len(sys.argv)!=9):
     print("wrong number of arguments")
     exit()
 
@@ -19,6 +19,11 @@ N=int(sys.argv[1])
 TStr=sys.argv[2]
 init_path=sys.argv[3]
 row=sys.argv[4]
+startingfileIndTmp=int(sys.argv[5])
+sweep_to_writeTmp=int(sys.argv[6])
+
+lagTmp=int(sys.argv[7])
+sweep_multiple=int(sys.argv[8])
 dataRoot=f"./dataAll/N{N}/row{row}/T{TStr}/init_path{init_path}/"
 
 csv_out_path=f"./dataAll/N{N}/row{row}/csvOut_init_path{init_path}/T{TStr}/"
@@ -67,9 +72,7 @@ def save_U_data(UVecSelected,varName):
 
 
 t_save_start=datetime.now()
-startingfileIndTmp=50
-sweep_multiple=3
-lagTmp=60
+
 varName="U"
 
 UVecSelected=U_extract_ForOneT(startingfileIndTmp,lagTmp,varName,sweep_multiple)
