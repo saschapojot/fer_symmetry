@@ -41,7 +41,10 @@ in plt/
    python compute_s_avg.py N init_path row
 2. plot magnitude of magnetization
    python load_csv_plt_abs_magnetization.py N init_path row
-
+3. plot Binder ratio for all N
+   python load_UL_all_N.py init_path row
+4. fit singularity
+   python fit_chi.py 
 
 ##############################
 plot auto-correlation for abs magnetization
@@ -49,3 +52,9 @@ plot auto-correlation for abs magnetization
    python compute_corr_abs_magnetization.py N init_path row
 2. plot auto-correlation of abs M for all T
    python load_csv_plt_abs_magnetization_corr.py N init_path row
+
+
+
+####################
+example of TT algorithm:
+python fit_singularity_example.py

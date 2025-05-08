@@ -46,7 +46,7 @@ def s_extract_ForOneT(startingFileInd,lag,varName,sweep_to_write):
     TRoot=dataRoot
 
     sorted_s_DataFilesToRead=sort_data_files_by_flushEnd(varName)
-
+    # print(f"sorted_s_DataFilesToRead={sorted_s_DataFilesToRead}")
     s_StartingFileName=sorted_s_DataFilesToRead[startingFileInd]
 
     with open(s_StartingFileName,"rb") as fptr:
@@ -79,12 +79,12 @@ def save_s_data(s_ArrSelected,varName):
 
 
 t_save_start=datetime.now()
-startingfileIndTmp=5
-sweep_to_writeTmp=100
-sweep_multiple=73
-lagTmp=15
-varName="s"
+startingfileIndTmp=50
+sweep_to_writeTmp=1000
 
+lagTmp=60
+varName="s"
+sweep_multiple=3
 s_ArrSelected=s_extract_ForOneT(startingfileIndTmp,lagTmp,varName,sweep_to_writeTmp)
 
 save_s_data(s_ArrSelected,varName)

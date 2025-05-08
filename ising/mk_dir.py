@@ -15,26 +15,25 @@ def format_using_decimal(value, precision=4):
     return str(formatted_value)
 
 
-N=16 #unit cell number
+N=128#unit cell number
 N0=N
 N1=N
 which_row=0
 
-T_start=1.5
-T_end=16.5
-T_step=0.5
-number=int((T_end-T_start)/T_step)
-TVals=[T_start+n*T_step for n in range(0,number+1)]
 
-default_flush_num=30
+T_vec1=[10+n*0.2 for n in range(0,6)]
+T_vec2=[11.3 + n*0.02 for n in range(0,11)]#11.3 to 11.5
+T_vec3=[20,50,80]
+TVals=T_vec2
+default_flush_num=120
 
 dataRoot="./dataAll/"
 
 dataOutDir=dataRoot
 
 effective_data_num_required=1000
-sweep_to_write=100
-sweep_multiple=73
+sweep_to_write=1000
+sweep_multiple=3
 in_param_file="./param.csv"
 param_arr=pd.read_csv(in_param_file)
 J=param_arr.iloc[which_row,0]
@@ -42,7 +41,7 @@ init_path_tot=1
 print(f"J={J}")
 print(f"N={N}")
 print(f"TVals={TVals}")
-
+print(f"len(TVals)={len(TVals)}")
 J_Str=format_using_decimal(J)
 
 TDirsAll=[]

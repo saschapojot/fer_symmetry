@@ -67,9 +67,9 @@ def save_U_data(UVecSelected,varName):
 
 
 t_save_start=datetime.now()
-startingfileIndTmp=5
-sweep_multiple=73
-lagTmp=15
+startingfileIndTmp=50
+sweep_multiple=3
+lagTmp=60
 varName="U"
 
 UVecSelected=U_extract_ForOneT(startingfileIndTmp,lagTmp,varName,sweep_multiple)

@@ -9,7 +9,7 @@ from sklearn.linear_model import LinearRegression
 
 alpha=2
 beta=1.2
-gamma=1.42
+gamma=0.55
 Tc=1.4
 
 # def f(T):
@@ -225,22 +225,27 @@ solutions=np.roots(coeffs_q_last)
 
 print(f"solutions={solutions}")
 
-T_num_c=solutions[2]
+which_T_ind=2
+T_num_c=solutions[which_T_ind]
 print(f"T_num_c={T_num_c}")
 
 
-# p_val=np.polyval(coeffs_p_last,T_num_c)
-# qprime_coeffs =np.polyder(coeffs_q_last)
-# q_val=np.polyval(coeffs_q_last,T_num_c)
-# print(f"q_val={q_val}")
-# qprime_val =np.polyval(qprime_coeffs,T_num_c)
-# residue = p_val / qprime_val
-#
-#
-# print("p(x0) =", p_val)
-# print("q'(x0) =", qprime_val)
-# print("Residue at x0 =", residue)
-#
+p_val=np.polyval(coeffs_p_last,T_num_c)
+
+# z_val=1
+# for j in range(0,len(solutions)):
+#     if j==which_T_ind:
+#         continue
+#     else:
+#         z_val*=(T_num_c-solutions[j])
+# print(f"p_val={p_val}")
+# print(f"z_val={z_val}")
+# print(p_val/z_val)
+
+
+
+
+
 inv_T_vals=np.array([1/(T-T_num_c) for T in T_vals]).reshape(-1, 1)
 # Create and fit the model
 model = LinearRegression()

@@ -10,9 +10,9 @@ double mc_computation::S_uni()
     return 1.0;
 }
 
-double mc_computation::acceptanceRatio_uni(const arma::dvec& arma_vec_curr,
-                                           const arma::dvec& arma_vec_next, const int& flattened_ind,
-                                           const double& UCurr, const double& UNext)
+double mc_computation::acceptanceRatio_uni(std::shared_ptr<const double[]>  vec_curr,
+                                  std::shared_ptr<const double[]>  vec_next, const int& flattened_ind,
+                                  const double& UCurr, const double& UNext)
 {
     double numerator = -this->beta * UNext;
     double denominator = -this->beta * UCurr;
@@ -262,16 +262,15 @@ void mc_computation::init_flattened_ind_and_neighbors()
 /// @param ind_neighbor index of spin around the center dipole (0..3)
 /// @param s_arma_vec flattened s array
 /// @return interaction energy of flattened_ind_center and ind_neighbor
-double mc_computation::H_interaction_local(const int& flattened_ind_center,
-    const int& ind_neighbor, const arma::dvec& s_arma_vec)
+double mc_computation::H_interaction_local(const int& flattened_ind_center,const int& ind_neighbor, std::shared_ptr<const double[]> s_vec)
 {
     // std::cout<<"flattened_ind_center="<<flattened_ind_center<<std::endl;
     // std::cout<<s_vec.n_elem<<std::endl;
     // s_vec.print("s_vec");
 
 
-    double s_center_val_tmp=s_arma_vec(flattened_ind_center);
-
+    // double s_center_val_tmp=s_arma_vec(flattened_ind_center);
+    double s_center_val_tmp=s_vec[flattened_ind_center];
     // std::cout<<"s_center_val_tmp="<<s_center_val_tmp<<std::endl;
 
 
@@ -282,7 +281,7 @@ double mc_computation::H_interaction_local(const int& flattened_ind_center,
     // <<", ind_neighbor="<<ind_neighbor
     // <<", flattened_ind_one_neighbor="<<flattened_ind_one_neighbor<<std::endl;
 
-    double s_neighbor_val_tmp=s_arma_vec(flattened_ind_one_neighbor);
+    double s_neighbor_val_tmp=s_vec[flattened_ind_one_neighbor];//s_arma_vec(flattened_ind_one_neighbor);
 
     // std::cout<<"s_neighbor_val_tmp="<<s_neighbor_val_tmp<<std::endl;
 
@@ -294,7 +293,7 @@ double mc_computation::H_interaction_local(const int& flattened_ind_center,
 ///
 /// @param s_arma_vec flattened s array
 /// @return total interaction energy
-double mc_computation::H_tot(const arma::dvec& s_arma_vec)
+double mc_computation::H_tot(std::shared_ptr<const double[]> s_vec)
 {
     double val=0;
     for (int n0=0;n0<N0;n0++)
@@ -311,7 +310,7 @@ double mc_computation::H_tot(const arma::dvec& s_arma_vec)
 
             for (int j=0;j<vec_ind_neighbor_tmp.size();j++)
             {
-                val+=H_interaction_local(flattened_ind,j,s_arma_vec);
+                val+=H_interaction_local(flattened_ind,j,s_vec);
             }//end j
 
         }//end n0
@@ -327,9 +326,8 @@ double mc_computation::H_tot(const arma::dvec& s_arma_vec)
 /// @param UCurr
 /// @param UNext
 void  mc_computation::H_update_local(const int &flattened_ind,
-                    const arma::dvec & s_arma_vec_curr,
-                    const arma::dvec & s_arma_vec_next,
-                    double& UCurr, double& UNext)
+                        std::shared_ptr<const double[]> s_vec_curr,std::shared_ptr<const double[]> s_vec_next,
+                        double& UCurr, double& UNext)
 {
   double E_int_curr=0;
 
@@ -343,7 +341,7 @@ void  mc_computation::H_update_local(const int &flattened_ind,
     //E_int_curr
     for (int j=0;j<neighbor_num;j++)
     {
-        E_int_curr+=H_interaction_local(flattened_ind,j,s_arma_vec_curr);
+        E_int_curr+=H_interaction_local(flattened_ind,j,s_vec_curr);
     }//end j
 
     UCurr=E_int_curr;
@@ -351,7 +349,7 @@ void  mc_computation::H_update_local(const int &flattened_ind,
     //E_int_next
     for (int j=0;j<neighbor_num;j++)
     {
-        E_int_next+=H_interaction_local(flattened_ind,j,s_arma_vec_next);
+        E_int_next+=H_interaction_local(flattened_ind,j,s_vec_next);
     }//end j
 
 
@@ -359,31 +357,32 @@ void  mc_computation::H_update_local(const int &flattened_ind,
 
     // std::cout<<"UCurr="<<UCurr<<", UNext="<<UNext<<std::endl;
 }
-void mc_computation::proposal_uni(const arma::dvec& arma_vec_curr, arma::dvec& arma_vec_next,
-                                  const int& flattened_ind)
+void mc_computation::proposal_uni(std::shared_ptr<const double[]> vec_curr,std::shared_ptr<double[]> vec_next, const int& flattened_ind)
 {
 
     double s_new=this->generate_uni_one_point();
     // std::cout<<"s_new="<<s_new<<std::endl;
-    arma_vec_next = arma_vec_curr;
-    arma_vec_next(flattened_ind) =s_new;
+    // arma_vec_next = arma_vec_curr;
+    // arma_vec_next(flattened_ind) =s_new;
+    std::memcpy(vec_next.get(),vec_curr.get(),N0*N1*sizeof(double));
+    vec_next[flattened_ind]=s_new;
 }
 
-void mc_computation::execute_mc_one_sweep(arma::dvec& s_arma_vec_curr,
-       arma::dvec& s_arma_vec_next,double& U_base_value)
+void mc_computation::execute_mc_one_sweep(std::shared_ptr<double[]> s_vec_curr,
+       std::shared_ptr<double[]> s_vec_next,double& U_base_value)
 {
     double UCurr=0;
     double UNext = 0;
-    U_base_value=this->H_tot(s_arma_vec_curr);
+    U_base_value=this->H_tot(s_vec_curr);
 
     //update s
     for (int i=0;i<N0*N1;i++)
     {
         int flattened_ind = unif_in_0_N0N1(e2);
-        this->proposal_uni(s_arma_vec_curr,s_arma_vec_next,flattened_ind);
-        this->H_update_local(flattened_ind,s_arma_vec_curr,s_arma_vec_next,UCurr,UNext);
+        this->proposal_uni(s_vec_curr,s_vec_next,flattened_ind);
+        this->H_update_local(flattened_ind,s_vec_curr,s_vec_next,UCurr,UNext);
 
-        double r=this->acceptanceRatio_uni(s_arma_vec_curr,s_arma_vec_next,flattened_ind,
+        double r=this->acceptanceRatio_uni(s_vec_curr,s_vec_next,flattened_ind,
            UCurr,UNext );
         double u = distUnif01(e2);
 
@@ -391,7 +390,8 @@ void mc_computation::execute_mc_one_sweep(arma::dvec& s_arma_vec_curr,
         // std::cout<<"UCurr="<<UCurr<<", UNext="<<UNext<<std::endl;
         if (u <= r)
         {
-            s_arma_vec_curr=s_arma_vec_next;
+            // s_arma_vec_curr=s_arma_vec_next;
+            std::memcpy(s_vec_curr.get(),s_vec_next.get(),N0*N1*sizeof(double));
             U_base_value+=UNext-UCurr;
 
         }//end of accept-reject
@@ -400,10 +400,16 @@ void mc_computation::execute_mc_one_sweep(arma::dvec& s_arma_vec_curr,
 
 }
 
-void mc_computation::execute_mc(const std::shared_ptr<double[]>& s_vec_init,const int& flushNum)
+void mc_computation::execute_mc(std::shared_ptr<const double[]> s_vec_init,const int& flushNum)
 {
-    arma::dvec s_arma_vec_curr(s_vec_init.get(),N0*N1);
-    arma::dvec s_arma_vec_next(N0*N1,arma::fill::zeros);
+    // arma::dvec s_arma_vec_curr(s_vec_init.get(),N0*N1);
+    std::shared_ptr<double[]>s_vec_curr=std::shared_ptr<double[]>(new double[N0 * N1],
+                                                      std::default_delete<double[]>());
+    std::memcpy(s_vec_curr.get(),s_vec_init.get(),N0 * N1*sizeof(double));
+    // arma::dvec s_arma_vec_next(N0*N1,arma::fill::zeros);
+    std::shared_ptr<double[]>s_vec_next=std::shared_ptr<double[]>(new double[N0 * N1],
+                                                      std::default_delete<double[]>());
+    std::fill(s_vec_next.get(), s_vec_next.get() + (N0 * N1), 0.0);
     double U_base_value=-12345;
 
     int flushThisFileStart=this->flushLastFile+1;
@@ -413,12 +419,12 @@ void mc_computation::execute_mc(const std::shared_ptr<double[]>& s_vec_init,cons
         const auto tMCStart{std::chrono::steady_clock::now()};
         for (int swp = 0; swp < sweepToWrite*sweep_multiple; swp++)
         {
-            this->execute_mc_one_sweep(s_arma_vec_curr,s_arma_vec_next,U_base_value);
+            this->execute_mc_one_sweep(s_vec_curr,s_vec_next,U_base_value);
             if(swp%sweep_multiple==0)
             {
                 int swp_out=swp/sweep_multiple;
                 this->U_data_all_ptr[swp_out]=U_base_value;
-                std::memcpy(s_all_ptr.get()+swp_out*N0*N1,s_arma_vec_curr.memptr(),N0*N1*sizeof(double));
+                std::memcpy(s_all_ptr.get()+swp_out*N0*N1,s_vec_curr.get(),N0*N1*sizeof(double));
             }//end save to array
         }//end sweep for
         int flushEnd=flushThisFileStart+fls;

@@ -4,7 +4,7 @@
 
 #ifndef MC_READ_LOAD_COMPUTE_HPP
 #define MC_READ_LOAD_COMPUTE_HPP
-#include <armadillo>
+// #include <armadillo>
 #include <boost/filesystem.hpp>
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
@@ -201,9 +201,9 @@ public: mc_computation(const std::string& cppInParamsFileName): e2(std::random_d
 
 public:
     void init_and_run();
-    void execute_mc(const std::shared_ptr<double[]>& s_vec_init,const int& flushNum);
-    void execute_mc_one_sweep(arma::dvec& s_arma_vec_curr,
-       arma::dvec& s_arma_vec_next,double& U_base_value);
+    void execute_mc(std::shared_ptr<const double[]> s_vec_init,const int& flushNum);
+    void execute_mc_one_sweep(std::shared_ptr<double[]> s_vec_curr,
+       std::shared_ptr<double[]> s_vec_next,double& U_base_value);
 
     ///
     /// @param flattened_ind flattened index of the element of s array to update
@@ -212,18 +212,18 @@ public:
     /// @param UCurr
     /// @param UNext
     void H_update_local(const int &flattened_ind,
-                        const arma::dvec & s_arma_vec_curr,const arma::dvec & s_arma_vec_next,
+                        std::shared_ptr<const double[]> s_vec_curr,std::shared_ptr<const double[]> s_vec_next,
                         double& UCurr, double& UNext);
     ///
     /// @param s_arma_vec flattened s array
     /// @return total interaction energy
-    double H_tot(const arma::dvec& s_arma_vec);
+    double H_tot(std::shared_ptr<const double[]> s_vec);
     ///
     /// @param flattened_ind_center (flattened) index of spin to be updated
     /// @param ind_neighbor index of spin around the center dipole (0..3)
     /// @param s_arma_vec flattened s array
     /// @return interaction energy of flattened_ind_center and ind_neighbor
-    double H_interaction_local(const int& flattened_ind_center,const int& ind_neighbor, const arma::dvec& s_arma_vec);
+    double H_interaction_local(const int& flattened_ind_center,const int& ind_neighbor, std::shared_ptr<const double[]> s_vec);
     void init_flattened_ind_and_neighbors();//this function initializes each point's neigboring indices(flattened), neigboring vectors, distance^2, distance^4
 
     int mod_direction0(const int&m0);
@@ -237,12 +237,13 @@ public:
     int double_ind_to_flat_ind(const int& n0, const int& n1);
     double generate_uni_one_point();
 
-    double acceptanceRatio_uni(const arma::dvec& arma_vec_curr,
-                                  const arma::dvec& arma_vec_next, const int& flattened_ind,
+    double acceptanceRatio_uni(std::shared_ptr<const double[]>  vec_curr,
+                                  std::shared_ptr<const double[]>  vec_next, const int& flattened_ind,
                                   const double& UCurr, const double& UNext);
     static double S_uni () ;
-    void proposal_uni(const arma::dvec& arma_vec_curr, arma::dvec& arma_vec_next,
-                               const int& flattened_ind);
+    // void proposal_uni(const std::shared_ptr<double[]>& vec_curr, std::shared_ptr<double[]>& vec_next,
+    //                            const int& flattened_ind);
+    void proposal_uni(std::shared_ptr<const double[]> vec_curr,std::shared_ptr<double[]> vec_next, const int& flattened_ind);
     void save_array_to_pickle(const std::shared_ptr<double[]>& ptr, int size, const std::string& filename);
 
     void load_pickle_data(const std::string& filename, std::shared_ptr<double[]>& data_ptr, std::size_t size);

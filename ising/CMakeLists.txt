@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(pbc_C3_fer LANGUAGES CXX)
+project(ising LANGUAGES CXX)
 
 
 message(STATUS "Using C++ compiler: ${CMAKE_CXX_COMPILER}")
@@ -16,8 +16,8 @@ set(BOOST_ROOT "$ENV{HOME}/cppLocal/boostBuild")
 find_package(Boost REQUIRED COMPONENTS python numpy filesystem)
 
 # Armadillo configuration
-find_path(ARMADILLO_INCLUDE_DIR armadillo HINTS "/home/adada/cppLocal/armadillo_intel/include")
-find_library(ARMADILLO_LIBRARY armadillo HINTS "/home/adada/cppLocal/armadillo_intel/lib")
+#find_path(ARMADILLO_INCLUDE_DIR armadillo HINTS "/home/adada/cppLocal/armadillo_intel/include")
+#find_library(ARMADILLO_LIBRARY armadillo HINTS "/home/adada/cppLocal/armadillo_intel/lib")
 
 
 # Add executable
@@ -26,7 +26,11 @@ add_executable(run_mc
         mc_subroutine/mc_read_load_compute.cpp
 )
 
-
+target_compile_options(run_mc PRIVATE
+        $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Release>:-march=native>
+        $<$<CONFIG:Release>:-ftree-vectorize>
+)
 # Set specific optimization for critical files
 set_source_files_properties(
         mc_subroutine/mc_read_load_compute.cpp
@@ -38,7 +42,6 @@ set_source_files_properties(
 # Include directories
 target_include_directories(run_mc PRIVATE
 
-        ${ARMADILLO_INCLUDE_DIR}
         ${Python3_INCLUDE_DIRS}
 )
 
@@ -46,7 +49,6 @@ target_include_directories(run_mc PRIVATE
 target_link_libraries(run_mc PRIVATE
         pthread
         m
-        ${ARMADILLO_LIBRARY}
         Boost::filesystem
         Boost::python
         Boost::numpy

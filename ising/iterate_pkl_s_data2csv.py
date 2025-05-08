@@ -17,18 +17,17 @@ def format_using_decimal(value, precision=4):
     return str(formatted_value)
 
 
-N=16 #unit cell number
+N=64#unit cell number
+
 row=0
-startingFileIndSuggest=5
+
 init_path=0
 
 
-T_start=1.5
-T_end=16.5
-T_step=0.5
-number=int((T_end-T_start)/T_step)
-TVals=[T_start+n*T_step for n in range(0,number+1)]
-
+T_vec1=[10+n*0.2 for n in range(0,6)]+[11.6,11.7,11.8,11.9,12,12.1,12.2,12.4,12.6,12.8]
+T_vec2=[11.3 + n*0.02 for n in range(0,11)]
+T_vec3=[20,50,80]
+TVals=T_vec2+T_vec3
 
 TStrAll=[]
 # Global variable to keep track of the currently running subprocess.
