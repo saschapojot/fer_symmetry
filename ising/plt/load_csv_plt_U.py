@@ -32,7 +32,7 @@ interval_upperValsAll=np.array(df["upper"])
 
 U_err_bar=UValsAll-interval_lowerValsAll
 # print(f"np.mean(U_err_bar)={np.mean(U_err_bar)}")
-mask = (TVec > 0.2) & (TVec <18)
+mask = (TVec > 0.8) & (TVec <18)
 TInds = np.where(mask)[0]
 TInds=TInds[::1]
 print(f"TInds={TInds}")

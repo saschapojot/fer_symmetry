@@ -48,6 +48,8 @@ sortedTFiles=[TFileNames[ind] for ind in sortedInds]
 def plt_s00_corr_one_T(oneTFile):
     matchT=re.search(r'T([-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)',oneTFile)
     TStr=matchT.group(1)
+    if float(TStr)<=0.8:
+        return
     s00_corr_csv_file_name=oneTFile+"/s00_corr.csv"
 
     s00_corr_arr=np.array(pd.read_csv(s00_corr_csv_file_name,header=None))
@@ -62,23 +64,36 @@ def plt_s00_corr_one_T(oneTFile):
     avg_corr = np.array([
         np.mean(s00_corr_arr[distances == d, 2]) for d in unique_distances
     ])
+    ###fit distances vs s00_corr_arr
+    # mask=(distances>10) & (distances<20)
+    # filtered_distances = distances[mask]
+    # filtered_corr = s00_corr_arr[mask, 2]
+    # # Ensure no non-positive values (logarithm is not defined for zero or negative values)
+    # valid = (filtered_distances > 0) & (filtered_corr > 0)
+    # filtered_distances = filtered_distances[valid]
+    # filtered_corr = filtered_corr[valid]
+    # # Take the logarithm of the filtered data
+    # log_dist = np.log(filtered_distances)
+    # log_corr = np.log(filtered_corr)
+    # X = log_dist.reshape(-1, 1)
+    # y = log_corr
+    # # Create and fit the linear regression model
+    # model = LinearRegression()
+    # model.fit(X, y)
 
-    mask=(distances>10) & (distances<20)
-    filtered_distances = distances[mask]
-    filtered_corr = s00_corr_arr[mask, 2]
-    # Ensure no non-positive values (logarithm is not defined for zero or negative values)
-    valid = (filtered_distances > 0) & (filtered_corr > 0)
-    filtered_distances = filtered_distances[valid]
-    filtered_corr = filtered_corr[valid]
-    # Take the logarithm of the filtered data
-    log_dist = np.log(filtered_distances)
-    log_corr = np.log(filtered_corr)
-    X = log_dist.reshape(-1, 1)
-    y = log_corr
-    # Create and fit the linear regression model
+    ###fit unique_distances vs avg_corr
+    mask=(unique_distances>10) &(unique_distances<np.sqrt(2)*N/1.5)
+    filtered_unique_distances=unique_distances[mask]
+    filtered_avg_corr=avg_corr[mask]
+    valid=(filtered_unique_distances>0) &(filtered_avg_corr>0)
+    filtered_unique_distances=filtered_unique_distances[valid]
+    filtered_avg_corr=filtered_avg_corr[valid]
+    log_unique_dist=np.log(filtered_unique_distances)
+    log_avg_corr=np.log(filtered_avg_corr)
+    X=log_unique_dist.reshape(-1,1)
+    y=log_avg_corr
     model = LinearRegression()
     model.fit(X, y)
-
     # Extract slope (coefficient) and intercept
     slope = model.coef_[0]
     intercept = model.intercept_
@@ -113,7 +128,7 @@ def plt_s00_corr_one_T(oneTFile):
         plt.xlabel('log(Distance)')
         plt.ylabel('log(s00_corr)')
         plt.title(f'Log-Log Linear Regression at T = {TStr}')
-        # plt.legend()
+        plt.legend()
         plt.grid(True)
         plt.savefig(s00_fit_dir+f"/s00_fit_T{TStr}.png")
         plt.close()
