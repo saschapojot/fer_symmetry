@@ -44,6 +44,7 @@ chi_total_all_T=[]
 chi_each_site_all_T=[]
 F1_val_all_T=[]
 U_L_all_T=[]
+magnetization_squared_all=[]
 def magetization_one_T(oneTFile):
     """
 
@@ -67,7 +68,7 @@ def magetization_one_T(oneTFile):
     df=pd.DataFrame(out_arr)
     df.to_csv(out_s_file_name, header=False, index=False)
     magnetization=np.mean(s_avg)
-
+    magnetization2=np.mean(s_avg**2)
     print(f"magnetization={magnetization}")
 
     #compute total magnetic dipole, by summing up all s in 1 configuration
@@ -104,21 +105,22 @@ def magetization_one_T(oneTFile):
     U_L_tmp=1-U_L_up/U_L_down
     magnetization_all_configs=np.mean(df_s,axis=1)
     M_rms=np.sqrt(np.mean(magnetization_all_configs**2))
-    return np.abs(magnetization),chi_val_total,chi_val_each_site,F1_val,U_L_tmp,M_rms
+    return np.abs(magnetization),chi_val_total,chi_val_each_site,F1_val,U_L_tmp,M_rms,magnetization2
 
 tStart=datetime.now()
 F1_inv_vals_all_T=[]
 M_rms_all_T=[]
 for k in range(0,len(sortedTFiles)):
     oneTFile=sortedTFiles[k]
-    s_abs,chi_val_total,chi_val_each_site,F1_val,U_L_tmp,M_rms=magetization_one_T(oneTFile)
+    s_abs,chi_val_total,chi_val_each_site,F1_val,U_L_tmp,M_rms,magnetization2=magetization_one_T(oneTFile)
     magnetization_abs_all.append(s_abs)
     chi_total_all_T.append(chi_val_total)
     chi_each_site_all_T.append(chi_val_each_site)
-    F1_val_all_T.append(F1_val)
-    F1_inv_vals_all_T.append(1/F1_val)
+    # F1_val_all_T.append(F1_val)
+    # F1_inv_vals_all_T.append(1/F1_val)
     U_L_all_T.append(U_L_tmp)
-    M_rms_all_T.append(M_rms)
+    # M_rms_all_T.append(M_rms)
+    magnetization_squared_all.append(magnetization2)
 
 
 
@@ -129,10 +131,8 @@ df=pd.DataFrame({
     "M":magnetization_abs_all,
     "chi_total:":chi_total_all_T,
     "chi_each_site":chi_each_site_all_T,
-    "d_T_log_chi":F1_val_all_T,
-    "d_T_log_chi_inv":F1_inv_vals_all_T,
     "U_L":U_L_all_T,
-    "M_rms":M_rms_all_T
+    "M2":magnetization_squared_all
 })
 df.to_csv(csv_file_name,index=False)
 

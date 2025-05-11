@@ -25,6 +25,7 @@ df=pd.read_csv(inCsvFile)
 
 TVec=np.array(df["T"])
 MValsAll=np.array(df["M"])
+M2ValsAll=np.array(df["M2"])
 chi_valsAll=np.array(df["chi_each_site"])
 U_L=np.array(df["U_L"])
 mask = (TVec > 0.8) & (TVec <18)
@@ -42,7 +43,7 @@ ax.errorbar(TToPlt,MValsAll[TInds],fmt='o',color="black",
             markersize=1)
 
 ax.set_xlabel('$T$')
-ax.set_ylabel("$|P|$")
+ax.set_ylabel("$|M|$")
 ax.set_title("norm of magnetization, unit cell number="+str(N**2))
 plt.legend(loc="best")
 plt.savefig(csvDataFolderRoot+"/M_abs.png")
@@ -72,4 +73,19 @@ ax.set_ylabel("$U_{L}$")
 ax.set_title("Binder ratio, unit cell number="+str(N**2))
 plt.legend(loc="best")
 plt.savefig(csvDataFolderRoot+"/UL.png")
+plt.close()
+
+
+
+fig,ax=plt.subplots()
+ax.errorbar(TToPlt,M2ValsAll[TInds],fmt='o',color="blue",
+            ecolor='r', capsize=0.1,label='mc',
+            markersize=1)
+
+
+ax.set_xlabel('$T$')
+ax.set_ylabel("$|M|^{2}$")
+ax.set_title("magnetization squared, unit cell number="+str(N**2))
+plt.legend(loc="best")
+plt.savefig(csvDataFolderRoot+"/M2.png")
 plt.close()

@@ -45,7 +45,17 @@ in plt/
    python load_UL_all_N.py init_path row
 4. fit singularity
    python fit_chi.py 
-
+##############################
+rescale and plot
+1. rescale for one N
+   python load_csv_plt_rescaled.py N init_path row
+2. rescale for all N
+   python load_csv_plt_rescaled_all.py init_path row
+##############################
+compute correlation function
+1. python compute_corr_s00_avg.py N init_path row
+2. plot correlation function of s00 and s_{ij}
+   python load_csv_plt_s00_corr.py N init_path row
 ##############################
 plot auto-correlation for abs magnetization
 1. compute auto-correlation of abs M for all T

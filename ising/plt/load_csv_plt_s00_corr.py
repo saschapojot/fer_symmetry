@@ -91,7 +91,10 @@ def plt_s00_corr_one_T(oneTFile):
     log_unique_dist=np.log(filtered_unique_distances)
     log_avg_corr=np.log(filtered_avg_corr)
     X=log_unique_dist.reshape(-1,1)
+    # X=np.array([log_unique_dist,filtered_unique_distances]).T
+    print(X.shape)
     y=log_avg_corr
+    print(y.shape)
     model = LinearRegression()
     model.fit(X, y)
     # Extract slope (coefficient) and intercept
@@ -103,7 +106,7 @@ def plt_s00_corr_one_T(oneTFile):
     # Print regression statistics
     print("======================")
     print(f"T={TStr}")
-    print(f"Slope: {slope:.3f}")
+    print(f"Slope: {slope}")
     print(f"Intercept: {intercept:.3f}")
     print(f"R-squared: {r_squared:.3f}")
 

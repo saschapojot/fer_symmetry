@@ -25,7 +25,7 @@ csvDataFolderRoot=f"../dataAll/N{N}/row{row}/csvOut_init_path{init_path}/"
 inCsvFile=csvDataFolderRoot+"/xi.csv"
 
 df=pd.read_csv(inCsvFile)
-Tc=1.11
+Tc=1.12
 TVec=np.array(df["T"])
 
 xiVec=np.array(df["xi"])
