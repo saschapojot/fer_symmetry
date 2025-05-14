@@ -46,7 +46,38 @@ def sort_data_files_by_flushEnd(varName):
     sortedDataFiles=[dataFilesAll[i] for i in endInds]
     return sortedDataFiles
 
+def read_one_s_Arr_lagged_row(array,lag, prev_last_row=None):
+    """
+    Extracts rows from array at regular intervals and calculates position for next array.
 
+    Args:
+        array: NumPy array to extract rows from
+        lag: Number of rows to skip
+        prev_last_row: Last row number from previous array extraction (None for first array)
+
+    Returns:
+        tuple: (extracted_rows, last_row_number)
+            - extracted_rows: NumPy array of extracted rows
+            - last_row_number: Index of the last extracted row
+    """
+    # Calculate start position
+    if prev_last_row is None:
+        # For the first array, start from index 0
+        start_position = 0
+    else:
+        # For subsequent arrays, calculate based on previous last row
+        start_position = (prev_last_row + lag) % len(array)
+
+    # Extract rows
+    extracted_rows = array[start_position::lag]
+    # Calculate the last row number that was extracted
+    if len(array) > 0:
+        last_extracted_index = ((len(array) - start_position - 1) // lag) * lag + start_position
+        last_row_number = last_extracted_index
+    else:
+        last_row_number = None
+
+    return extracted_rows, last_row_number
 def s_extract_ForOneT(startingFileInd,lag,varName,sweep_to_write):
     TRoot=dataRoot
 
@@ -54,19 +85,21 @@ def s_extract_ForOneT(startingFileInd,lag,varName,sweep_to_write):
     # print(f"sorted_s_DataFilesToRead={sorted_s_DataFilesToRead}")
     s_StartingFileName=sorted_s_DataFilesToRead[startingFileInd]
 
+    #read s_StartingFileName
     with open(s_StartingFileName,"rb") as fptr:
         s_inArrStart=np.array(pickle.load(fptr))
 
-    s_Arr=s_inArrStart.reshape((sweep_to_write,-1))
-    #read the rest of  pkl files
-
+    s_Arr0=s_inArrStart.reshape((sweep_to_write,-1))
+    last_row = None
+    extracted_rows0, last_row=read_one_s_Arr_lagged_row(s_Arr0,lag,last_row)
+    s_ArrSelected=extracted_rows0
     for pkl_file in sorted_s_DataFilesToRead[(startingFileInd+1):]:
         with open(pkl_file,"rb") as fptr:
             s_inArr=np.array(pickle.load(fptr))
         s_inArr=s_inArr.reshape((sweep_to_write,-1))
-        s_Arr=np.concatenate((s_Arr,s_inArr),axis=0)
+        extracted_rows_j,last_row=read_one_s_Arr_lagged_row(s_inArr,lag,last_row)
+        s_ArrSelected=np.concatenate((s_ArrSelected,extracted_rows_j),axis=0)
 
-    s_ArrSelected=s_Arr[::lag,:]
 
     return s_ArrSelected
 
