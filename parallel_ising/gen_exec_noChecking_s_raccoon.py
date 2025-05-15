@@ -20,7 +20,7 @@ if os.path.isdir(outPath):
 
 
 Path(outPath).mkdir(exist_ok=True,parents=True)
-N=150 #unit cell number
+N=64 #unit cell number
 startingFileIndSuggest=8
 init_path=0
 which_row=1
@@ -36,8 +36,8 @@ T_vec1=[0.5+0.1*n for n in range(0,6)]+[0.5+0.1*n for n in range(8,16)]
 T_vec2=[1.12+0.02*n for n in range(0,5)]#1.12, 1.14, 1.16, 1.18, 1.2
 T_vec3=[1.13,1.15,1.17,1.19]
 T_vec4=[1.21,1.22,1.23,1.24,1.25]
-# T_vec_tmp=[1.2]
-TVals=T_vec1+T_vec2+T_vec3+T_vec4
+T_vec_tmp=[1.2]
+TVals=T_vec_tmp
 chunks = [TVals[i:i + chunk_size] for i in range(0, len(TVals), chunk_size)]
 
 def contents_to_bash(chk_ind,T_ind,chunks):
@@ -51,8 +51,9 @@ def contents_to_bash(chk_ind,T_ind,chunks):
         "#SBATCH --mem=4GB\n",
         f"#SBATCH -o out_exec_noChecking_s_{TStr}.out\n",
         f"#SBATCH -e out_exec_noChecking_s_{TStr}.err\n",
-        "cd /public/home/hkust_jwliu_1/liuxi/Documents/cppCode/fer_symmetry/ising\n",
+        "cd /home/cywanag/data/hpc/cywanag/liuxi/Document/cppCode/fer_symmetry/parallel_ising\n",
         f"python3 -u launch_one_run_dipole.py"+f"./dataAll/N{N}/row{which_row}/T{TStr}/init_path{init_path}/run_T{TStr}_init_path{init_path}.mc.conf\n",
+        f"numactl --interleave=all  ./run_mc ./dataAll/N{N}/row{which_row}/T{TStr}/init_path{init_path}/cppIn.txt\n"
 
         ]
     out_chunk=outPath+f"/chunk{chk_ind}/"
