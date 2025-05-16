@@ -55,6 +55,7 @@ void mc_computation::update_spins_parallel_1_sweep(double& U_base_value)
                 double dE = delta_energy(idx);
                 if (dE <= 0 || get_thread_random(t) <= std::exp(-dE * beta)) {
                     s_init[idx] *= -1;  // Flip spin (no energy update)
+                    // std::cout<<"s_init["<<idx<<"] updated."<<std::endl;
                 }
             }
         });
@@ -74,6 +75,7 @@ void mc_computation::update_spins_parallel_1_sweep(double& U_base_value)
                 double dE = delta_energy(idx);
                 if (dE <= 0 || get_thread_random(t) <= std::exp(-dE * beta)) {
                     s_init[idx] *= -1;  // Flip spin (no energy update)
+                    // std::cout<<"s_init["<<idx<<"] updated."<<std::endl;
                 }
             }
         });
@@ -83,6 +85,7 @@ void mc_computation::update_spins_parallel_1_sweep(double& U_base_value)
 
 
     U_base_value=this->H_tot(s_init);
+    // std::cout<<"U_base_value="<<U_base_value<<std::endl;
 }
 
 
@@ -97,7 +100,7 @@ void mc_computation::update_spins_parallel_1_sweep(double& U_base_value)
     // std::cout<<"flattened_ind="<<flattened_ind<<", vec_ind_neighbor_tmp:"<<std::endl;
     // print_vector(vec_ind_neighbor_tmp);
     // std::cout<<"vec_ind_neighbor_tmp.size()="<<vec_ind_neighbor_tmp.size()<<std::endl;
-    double sum_neigbors;
+    double sum_neigbors=0;
     //j=0,1,2,3
     for (int j = 0; j < vec_ind_neighbor_tmp.size(); j++)
     {

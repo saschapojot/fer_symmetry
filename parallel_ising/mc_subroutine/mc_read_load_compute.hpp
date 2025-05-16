@@ -218,7 +218,7 @@ public:
 
     // Thread-local RNGs
     static double get_thread_random(int thread_id) {
-        static thread_local std::mt19937 generator(std::random_device{}());
+        static thread_local std::ranlux24_base generator(std::random_device{}());
         static thread_local std::uniform_real_distribution<double> dist(0.0, 1.0);
         return dist(generator);
     }
