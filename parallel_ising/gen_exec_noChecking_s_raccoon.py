@@ -24,7 +24,7 @@ N=64 #unit cell number
 startingFileIndSuggest=8
 init_path=0
 which_row=1
-chunk_size = 25
+chunk_size = 100
 
 ###for row 0
 # T_vec1=[10+n*0.2 for n in range(0,6)]

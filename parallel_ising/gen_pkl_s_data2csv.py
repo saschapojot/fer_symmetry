@@ -26,9 +26,10 @@ N=64#unit cell number
 init_path=0
 which_row=1
 startingFileIndSuggest=30
-sweep_to_write=1000
-lag=200
-sweep_multiple=3
+sweep_to_write=500
+sweep_multiple=6
+lag=100
+
 
 chunk_size = 25
 #for row 0

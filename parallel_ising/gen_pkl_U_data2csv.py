@@ -24,11 +24,12 @@ N=64#unit cell number
 init_path=0
 which_row=1
 startingFileIndSuggest=30
-sweep_to_write=1000
-lag=150
-sweep_multiple=3
+sweep_to_write=500
+sweep_multiple=6
+lag=75
 
-chunk_size = 25
+
+chunk_size = 100
 
 #for row 0
 # T_vec1=[10+n*0.2 for n in range(0,6)]
