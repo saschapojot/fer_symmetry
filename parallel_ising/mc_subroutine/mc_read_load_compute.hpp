@@ -178,6 +178,10 @@ public: mc_computation(const std::string& cppInParamsFileName)
         this->s_init=std::shared_ptr<double[]>(new double[N0 * N1],
                                                       std::default_delete<double[]>());
 
+        this->M_all_ptr=std::shared_ptr<double[]>(new double[sweepToWrite],
+                                                            std::default_delete<double[]>());
+
+
     }
     catch (const std::bad_alloc& e)
     {
@@ -193,10 +197,15 @@ public: mc_computation(const std::string& cppInParamsFileName)
     {
         fs::create_directories(out_U_path);
     }
-    this->out_s_path = this->U_s_dataDir + "/s/";
+   this->out_s_path = this->U_s_dataDir + "/s/";
     if (!fs::is_directory(out_s_path) || !fs::exists(out_s_path))
     {
         fs::create_directories(out_s_path);
+   }
+    this->out_M_path= this->U_s_dataDir + "/M/";
+    if (!fs::is_directory(out_M_path) || !fs::exists(out_M_path))
+    {
+    fs::create_directories(out_M_path);
     }
 
     // this->unif_in_0_N0N1 = std::uniform_int_distribution<int>(0, N0 * N1-1);
@@ -213,6 +222,15 @@ public:
     void init_and_run();
     void execute_mc(std::shared_ptr<const double[]> s_vec_init,const int& flushNum);
 
+    ///
+    ///compute M in parallel for all configurations
+    void compute_all_magnetizations_parallel();
+    ///
+    /// @param startInd starting index of 1 configuration
+    /// @param length N*N
+    /// @param s_all_ptr containing each s_{ij} for each configuration
+    /// @return average of s_{ij} from index startInd to index startInd+length-1
+    double compute_M_avg_over_sites(const int &startInd, const int & length);
 
     void update_spins_parallel_1_sweep(double& U_base_value);
 
@@ -250,12 +268,12 @@ public:
     int double_ind_to_flat_ind(const int& n0, const int& n1);
     int mod_direction0(const int&m0);
     int mod_direction1(const int&m1);
-    void save_array_to_pickle(const std::shared_ptr<double[]>& ptr, int size, const std::string& filename);
+    void save_array_to_pickle(std::shared_ptr<const double[]> ptr, int size, const std::string& filename);
 
     void load_pickle_data(const std::string& filename, std::shared_ptr<double[]>& data_ptr, std::size_t size);
 
     template <class T>
-    void print_shared_ptr(const std::shared_ptr<T>& ptr, const int& size)
+    void print_shared_ptr(std::shared_ptr<T> ptr, const int& size)
     {
         if (!ptr)
         {
@@ -320,9 +338,12 @@ public:
     int sweep_multiple;
     std::string out_U_path;
     std::string out_s_path;
+    std::string out_M_path;
     //data in 1 flush
     std::shared_ptr<double[]> U_data_all_ptr; //all U data
-    std::shared_ptr<double[]> s_all_ptr; //all Px data
+    std::shared_ptr<double[]> s_all_ptr; //all s data
+    std::shared_ptr<double[]> M_all_ptr; //all M data
+
     // std::vector<double>s_vals;
 
     //initial value

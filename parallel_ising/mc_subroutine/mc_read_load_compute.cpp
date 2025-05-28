@@ -25,11 +25,18 @@ void mc_computation::execute_mc(std::shared_ptr<const double[]> s_vec_init,const
         std::string fileNameMiddle =  "flushEnd" + std::to_string(flushEnd);
         std::string out_U_PickleFileName = out_U_path+"/" + fileNameMiddle + ".U.pkl";
 
-        std::string out_s_PickleFileName=out_s_path+"/"+fileNameMiddle+".s.pkl";
+        // std::string out_s_PickleFileName=out_s_path+"/"+fileNameMiddle+".s.pkl";
         //save U
         this->save_array_to_pickle(U_data_all_ptr,sweepToWrite,out_U_PickleFileName);
         //save s
-        this->save_array_to_pickle(s_all_ptr,sweepToWrite*N0*N1,out_s_PickleFileName);
+        // this->save_array_to_pickle(s_all_ptr,sweepToWrite*N0*N1,out_s_PickleFileName);
+
+        //compute M
+        this->compute_all_magnetizations_parallel();
+        std::string out_M_PickleFileName=this->out_M_path+"/" + fileNameMiddle + ".M.pkl";
+        //save M
+        this->save_array_to_pickle(M_all_ptr,sweepToWrite,out_M_PickleFileName);
+
         const auto tMCEnd{std::chrono::steady_clock::now()};
         const std::chrono::duration<double> elapsed_secondsAll{tMCEnd - tMCStart};
         std::cout << "flush " + std::to_string(flushEnd)  + ": "
@@ -40,16 +47,25 @@ void mc_computation::execute_mc(std::shared_ptr<const double[]> s_vec_init,const
 }
 void mc_computation::update_spins_parallel_1_sweep(double& U_base_value)
 {
-    const int num_threads = this->num_parallel;
+    // const int num_threads = this->num_parallel;
+    int actual_threads_red = std::min(this->num_parallel, static_cast<int>(flattened_red_points.size()));
+
     std::vector<std::thread> threads;
 
     // Update red points (parallel)
-    int chunk_size = flattened_red_points.size() / num_threads;
-    for (int t = 0; t < num_threads; ++t) {
+    int chunk_size = flattened_red_points.size() / actual_threads_red;
+    for (int t = 0; t < actual_threads_red; ++t) {
         int start = t * chunk_size;
-        int end = (t == num_threads - 1) ? flattened_red_points.size() : start + chunk_size;
+        int end = (t == actual_threads_red - 1) ? flattened_red_points.size() : start + chunk_size;
 
         threads.emplace_back([this, start, end, t] {
+            // Set thread affinity at the beginning of each thread
+            // cpu_set_t cpuset;
+            // CPU_ZERO(&cpuset);
+            // // Map thread to specific core, distributing across NUMA nodes
+            // int core_id = t % 64;
+            // CPU_SET(core_id, &cpuset);
+            // pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
             for (int i = start; i < end; ++i) {
                 int idx = flattened_red_points[i];
                 double dE = delta_energy(idx);
@@ -64,12 +80,22 @@ void mc_computation::update_spins_parallel_1_sweep(double& U_base_value)
     threads.clear();
     //====================================================
     // Update black points (parallel)
-    chunk_size = flattened_black_points.size() / num_threads;
-    for (int t = 0; t < num_threads; ++t) {
+    int actual_threads_black = std::min(this->num_parallel, static_cast<int>(flattened_black_points.size()));
+
+    chunk_size = flattened_black_points.size() / actual_threads_black;
+    for (int t = 0; t < actual_threads_black; ++t) {
         int start = t * chunk_size;
-        int end = (t == num_threads - 1) ? flattened_black_points.size() : start + chunk_size;
+        int end = (t == actual_threads_black - 1) ? flattened_black_points.size() : start + chunk_size;
 
         threads.emplace_back([this, start, end, t] {
+            // Set thread affinity at the beginning of each thread
+                       // cpu_set_t cpuset;
+                       // CPU_ZERO(&cpuset);
+                       // // Map thread to specific core, distributing across NUMA nodes
+                       // int core_id = t % 64;
+                       // CPU_SET(core_id, &cpuset);
+                       // pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+
             for (int i = start; i < end; ++i) {
                 int idx = flattened_black_points[i];
                 double dE = delta_energy(idx);
@@ -190,6 +216,16 @@ void mc_computation::init_and_run()
     this->init_flattened_ind_and_neighbors();
     this->init_red_and_black_points();
     this->execute_mc(s_init,newFlushNum);
+
+
+    // for (int j=0;j<sweepToWrite*N0*N1;j++)
+    // {
+    //     this->s_all_ptr[j]=j;
+    // }
+    // this->compute_all_magnetizations_parallel();
+    // std::string outM_file=this->out_M_path+"/M_init.pkl";
+    // this->save_array_to_pickle(this->M_all_ptr,sweepToWrite,outM_file);
+    // std::cout<<"M_all_ptr[0]="<<M_all_ptr[0]<<std::endl;
 }
 
 void mc_computation::init_flattened_ind_and_neighbors()
@@ -357,7 +393,7 @@ void mc_computation::load_pickle_data(const std::string& filename, std::shared_p
     }
 }
 
-void mc_computation::save_array_to_pickle(const std::shared_ptr<double[]>& ptr, int size, const std::string& filename)
+void mc_computation::save_array_to_pickle(std::shared_ptr<const double[]> ptr, int size, const std::string& filename)
 {
     using namespace boost::python;
     namespace np = boost::python::numpy;
@@ -414,4 +450,63 @@ void mc_computation::save_array_to_pickle(const std::shared_ptr<double[]>& ptr, 
     {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
+}
+
+
+
+///
+/// @param startInd starting index of 1 configuration
+/// @param length N*N
+/// @param s_all_ptr containing each s_{ij} for each configuration
+/// @return average of s_{ij} from index startInd to index startInd+length-1
+double mc_computation::compute_M_avg_over_sites(const int &startInd, const int & length)
+{
+double avg=0.0;
+    for (int j=startInd;j<startInd+length;j++)
+    {
+        avg+=this->s_all_ptr[j];
+    }
+    return avg/static_cast<double>(length);
+}
+
+///
+///compute M in parallel for all configurations
+void mc_computation::compute_all_magnetizations_parallel()
+{
+     int num_threads = num_parallel;
+    int config_size=N0*N1;
+   int  num_configs=sweepToWrite;
+    // Ensure we don't create more threads than configurations
+    num_threads = std::min(num_threads, static_cast< int>(num_configs));
+
+    // Calculate how many configurations each thread will process
+    int configs_per_thread = num_configs / num_threads;
+    int remaining_configs = num_configs % num_threads;
+    // Vector to store threads
+    std::vector<std::thread> threads;
+
+    // Create and launch threads
+    int start_config = 0;
+    for (unsigned int t = 0; t < num_threads; ++t) {
+        // Calculate range for this thread
+        int configs_for_this_thread = configs_per_thread + (t < remaining_configs ? 1 : 0);
+        int end_config = start_config + configs_for_this_thread;
+
+        // Launch thread
+        threads.emplace_back([this, start_config, end_config, config_size]() {
+            for (int i = start_config; i < end_config; ++i) {
+                int startInd = i * config_size;
+                // Calculate magnetization and store directly in M_all_ptr
+                this->M_all_ptr[i] = this->compute_M_avg_over_sites(startInd, config_size);
+            }
+        });
+
+        start_config = end_config;
+    }
+
+    // Join all threads
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
 }
