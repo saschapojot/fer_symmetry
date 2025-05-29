@@ -41,16 +41,27 @@ TInds=TInds[::1]
 TToPlt=TVec[TInds]
 J_abs=1/2
 def C_per_site_exact(T):
-    beta=1/T
-    beta_J=beta*J_abs
-    kappa = 2 * np.sinh(2 * beta_J) / np.cosh(2 * beta_J)**2
-    K1 = ellipk(kappa**2)
-    E1 = ellipe(kappa**2)
-    term1 = K1 - E1
-    tanh_sq = np.tanh(2 * beta_J)**2
-    term2 = (1 - tanh_sq) * (np.pi/2 + (2 * tanh_sq - 1) * K1)
-    prefactor = (2 / np.pi) * (beta_J * 1/np.tanh(2 * beta_J))**2
-    return prefactor * (term1 - term2)
+    beta = 1 / (1 * T)
+    x = 2 * beta * J_abs
+    sinh_x = np.sinh(x)
+    cosh_x = np.cosh(x)
+
+    k = 2 * sinh_x / (cosh_x ** 2)  # Modulus k
+    k_prime = np.sqrt(1 - k**2)     # Complementary modulus
+
+
+
+    # Complete elliptic integrals
+    K = ellipk(k**2)  # scipy uses m = k^2
+    E = ellipe(k**2)
+
+    # Compute C(T) using Ferdinand & Fisher's formula
+    term1 = (x / np.tanh(x))**2
+    term2 = (K - E) - (1 - np.tanh(x)**2) * (np.pi/2 + (2 * np.tanh(x)**2 - 1) * K)
+    C = (4 / np.pi) * term1 * term2
+
+    return C/4
+
 
 C_exact_plot=[C_per_site_exact(T) for T in TToPlt]
 #plt C
@@ -63,7 +74,7 @@ fig,ax=plt.subplots()
 ax.errorbar(TToPlt,CValsAll[TInds],fmt='o',color="green",
             ecolor='magenta', capsize=0.1,label='mc',
             markersize=3)
-# ax.plot(TToPlt,C_exact_plot,color="blue",linestyle="--")
+ax.plot(TToPlt,C_exact_plot,color="blue",linestyle="--")
 # ax.set_xscale("log")
 ax.set_xlabel('$T$')
 ax.set_ylabel("C")

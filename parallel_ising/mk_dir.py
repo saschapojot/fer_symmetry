@@ -15,7 +15,7 @@ def format_using_decimal(value, precision=4):
     return str(formatted_value)
 
 
-N=150#unit cell number
+N=23#unit cell number
 N0=N
 N1=N
 which_row=1
@@ -34,9 +34,12 @@ T_vec2=[1.12+0.02*n for n in range(0,5)]#1.12, 1.14, 1.16, 1.18, 1.2
 T_vec3=[1.13,1.15,1.17,1.19]
 T_vec4=[1.21,1.22,1.23,1.24,1.25]
 T_vec_tmp=[2.1]
-TVals=T_vec_tmp
-default_flush_num=3
-num_parallel=20
+
+TVals=T_vec2+T_vec3+T_vec4
+default_flush_num=2
+
+
+num_parallel=24
 print(f"num_parallel={num_parallel}")
 print(f"default_flush_num={default_flush_num}")
 dataRoot="./dataAll/"
@@ -44,8 +47,8 @@ dataRoot="./dataAll/"
 dataOutDir=dataRoot
 
 effective_data_num_required=1000
-sweep_to_write=1000
-sweep_multiple=3
+sweep_to_write=500
+sweep_multiple=6
 in_param_file="./param.csv"
 param_arr=pd.read_csv(in_param_file)
 J=param_arr.iloc[which_row,0]

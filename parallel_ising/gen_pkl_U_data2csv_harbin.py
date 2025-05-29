@@ -16,11 +16,11 @@ def format_using_decimal(value, precision=6):
     formatted_value = decimal_value.quantize(Decimal(1)) if decimal_value == decimal_value.to_integral() else decimal_value.normalize()
     return str(formatted_value)
 
-outPath="./bashFiles_pkl_s_data2csv/"
+outPath="./bashFiles_pkl_U_data2csv/"
 if os.path.isdir(outPath):
     shutil.rmtree(outPath)
 Path(outPath).mkdir(exist_ok=True,parents=True)
-N=250#unit cell number
+N=300#unit cell number
 init_path=0
 which_row=1
 startingFileIndSuggest=30
@@ -60,17 +60,17 @@ def contents_to_bash(chk_ind,T_ind,chunks):
         "#SBATCH -n 1\n",
         "#SBATCH -N 1\n",
         "#SBATCH -t 0-60:00\n",
-        "#SBATCH -p lzicnormal\n",
-        "#SBATCH --mem=15GB\n",
-        f"#SBATCH -o out_pkl_s_data2csv_{TStr}.out\n",
-        f"#SBATCH -e out_pkl_s_data2csv_{TStr}.err\n",
+        "#SBATCH -p hebhcnormal01\n",
+        "#SBATCH --mem=6GB\n",
+        f"#SBATCH -o out_pkl_U_data2csv_{TStr}.out\n",
+        f"#SBATCH -e out_pkl_U_data2csv_{TStr}.err\n",
         "cd  /public/home/hkust_jwliu_1/liuxi/Documents/cppCode/fer_symmetry/parallel_ising\n",
-        f"python3 -u ./data2csv/pkl_s_data2csv.py {N} {TStr} {init_path}  {which_row} {startingFileIndSuggest} {sweep_to_write} {lag} {sweep_multiple}\n"
+        f"python3 -u ./data2csv/pkl_U_data2csv.py {N} {TStr} {init_path}  {which_row} {startingFileIndSuggest} {sweep_to_write} {lag} {sweep_multiple}\n"
 
     ]
     out_chunk=outPath+f"/chunk{chk_ind}/"
     Path(out_chunk).mkdir(exist_ok=True,parents=True)
-    outBashName=out_chunk+f"/pkl_s_data2csv_T{TStr}.sh"
+    outBashName=out_chunk+f"/pkl_U_data2csv_T{TStr}.sh"
     with open(outBashName,"w+") as fptr:
         fptr.writelines(contents)
 

@@ -26,7 +26,7 @@ df=pd.read_csv(inCsvFile)
 TVec=np.array(df["T"])
 # M2ValsAll=np.array(df["M2"])
 chi_each_site_all=np.array(df["chi_each_site"])
-mask = (TVec > 1.12) & (TVec <18)
+mask = (TVec > 1.12) & (TVec <1.2)
 
 Tc=1.12
 TInds = np.where(mask)[0]

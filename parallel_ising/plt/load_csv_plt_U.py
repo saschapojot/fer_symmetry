@@ -18,7 +18,7 @@ if (len(sys.argv)!=4):
 N=int(sys.argv[1])
 init_path=int(sys.argv[2])
 row=sys.argv[3]
-csvDataFolderRoot=f"../dataAll/N{N}/row{row}/csvOut_init_path{init_path}/"
+csvDataFolderRoot=f"./dataAll/N{N}/row{row}/csvOut_init_path{init_path}/"
 
 inCsvFile=csvDataFolderRoot+"/U_plot.csv"
 

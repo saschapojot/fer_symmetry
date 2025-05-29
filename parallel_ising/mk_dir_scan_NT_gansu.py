@@ -20,7 +20,13 @@ b_vec=[1,2,3,4,5,6,7,8]
 
 NVec_base=[5,6,7,8]
 
-
+bN_vec=[]
+for b in b_vec:
+    for NBase in NVec_base:
+        bN=b*NBase
+        bN_vec.append(bN)
+bN_vec=list(set(bN_vec))
+print(f"bN_vec={bN_vec}")
 which_row=1
 # (1-eps)Tc, (1+eps)Tc
 #Tc=1.13459265710651
@@ -58,8 +64,7 @@ for k in range(0,len(TVals)):
     TStr=format_using_decimal(T)
     TStrAll.append(TStr)
 
-def contents_to_conf(k,which_init_ind,N_base,b):
-    bN=b*N_base
+def contents_to_conf(k,which_init_ind,bN):
     NStr=format_using_decimal(bN)
     contents=[
         "#This is the configuration file for 2d Ising mc computations\n",
@@ -94,6 +99,6 @@ def contents_to_conf(k,which_init_ind,N_base,b):
         fptr.writelines(contents)
 
 for k in range(0,len(TVals)):
-    for N_base in NVec_base:
-        for b in b_vec:
-            contents_to_conf(k,0,N_base,b)
+    for bN in bN_vec:
+        contents_to_conf(k,0,bN)
+

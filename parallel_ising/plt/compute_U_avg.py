@@ -19,10 +19,10 @@ if (len(sys.argv)!=4):
 N=int(sys.argv[1])
 init_path=int(sys.argv[2])
 row=sys.argv[3]
-csvDataFolderRoot=f"../dataAll/N{N}/row{row}/csvOut_init_path{init_path}/"
+csvDataFolderRoot=f"./dataAll/N{N}/row{row}/csvOut_init_path{init_path}/"
 TVals=[]
 TFileNames=[]
-
+sep=2
 for TFile in glob.glob(csvDataFolderRoot+"/T*"):
 
     matchT=re.search(r"T([-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)",TFile)
@@ -94,6 +94,7 @@ def generate_one_U_point(oneTFile):
     U_distPath=oneTFile+"/U.csv"
     df=pd.read_csv(U_distPath,header=None)
     UVec=np.array(df.iloc[:,0])
+    UVec=UVec[::sep]
     print("T="+str(TVal)+", data num="+str(len(UVec)))
     jackknife_estimate,ci_lower, ci_upper=U_confidence_interval(UVec)
     return [jackknife_estimate,ci_lower, ci_upper]

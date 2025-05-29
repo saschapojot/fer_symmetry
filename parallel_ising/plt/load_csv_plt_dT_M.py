@@ -90,6 +90,19 @@ perr_N3 = np.sqrt(np.diag(pcov_N3))  # Parameter uncertainties
 beta_fit_N3,b2_fit_N3,b3_fit_N3=popt_N3
 print(f"beta_fit_N3={beta_fit_N3} ± {perr_N3[0]:.4f}, b2_fit_N3={b2_fit_N3} ± {perr_N3[1]:.4f}, b3_fit_N3={b3_fit_N3} ± {perr_N3[2]:.4f}")
 
+
+
+# def y_func_rational_N2(T,beta,b2):
+#     val_up=-1-2*b2*(Tc_BR-T)
+#     val_down=Tc_BR-T+b2*(Tc_BR-T)**2
+#     return beta*val_up/val_down
+#
+# popt_N2,pcov_N2=curve_fit(y_func_rational_N2,TVec_numerical,F1_vals)
+# perr_N2 = np.sqrt(np.diag(pcov_N2))  # Parameter uncertainties
+# beta_fit_N2,b2_fit_N2=popt_N2
+# print(f"beta_fit_N2={beta_fit_N2} ± {perr_N2[0]:.4f}, b2_fit_N2={b2_fit_N2} ± {perr_N2[1]:.4f}")
+
+
 #TT algorithm part
 #
 # B=[]

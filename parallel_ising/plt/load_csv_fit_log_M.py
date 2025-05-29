@@ -26,7 +26,7 @@ df=pd.read_csv(inCsvFile)
 TVec_numerical=np.array(df["T"])
 M_vec_numerical=np.array(df["M"])
 
-Tc_BR=1.13
+Tc_BR=1.01
 
 t_vec=(Tc_BR-TVec_numerical)/Tc_BR
 
