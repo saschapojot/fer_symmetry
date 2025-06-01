@@ -337,7 +337,7 @@ int mc_computation::mod_direction1(const int& m1)
 }
 
 
-void mc_computation::load_pickle_data(const std::string& filename, std::shared_ptr<double[]>& data_ptr,
+void mc_computation::load_pickle_data(const std::string& filename, std::shared_ptr<double[]> data_ptr,
                                       std::size_t size)
 {
     // Initialize Python and NumPy

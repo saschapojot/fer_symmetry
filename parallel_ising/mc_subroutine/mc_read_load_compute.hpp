@@ -270,7 +270,7 @@ public:
     int mod_direction1(const int&m1);
     void save_array_to_pickle(std::shared_ptr<const double[]> ptr, int size, const std::string& filename);
 
-    void load_pickle_data(const std::string& filename, std::shared_ptr<double[]>& data_ptr, std::size_t size);
+    void load_pickle_data(const std::string& filename, std::shared_ptr<double[]> data_ptr, std::size_t size);
 
     template <class T>
     void print_shared_ptr(std::shared_ptr<T> ptr, const int& size)
