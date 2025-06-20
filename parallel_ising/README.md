@@ -63,8 +63,45 @@ plot auto-correlation for abs magnetization
 2. plot auto-correlation of abs M for all T
    python load_csv_plt_abs_magnetization_corr.py N init_path row
 
-
+##############################
+fit M ~ t^beta
+in plt/
+1. python compute_dT_M.py N init_path row
+2. python load_csv_plt_dT_M.py N init_path row
 
 ####################
 example of TT algorithm:
 python fit_singularity_example.py
+
+
+
+#######################
+
+for scan NT
+1. set sep=xxx in plt/compute_U_avg.py
+2. set sep=xxx in plt/compute_M_avg.py
+3. compute U avg:
+   python iterate_compute_U_avg.py
+4. plot U avg:
+   python iterate_load_csv_plt_U.py
+5. plot M and M2:
+   python iterate_load_csv_plt_M.py
+6. compare M, M2 for different N
+   cd plt/
+   python load_csv_plt_compare_M.py init_path row
+
+7. compute W for 1 N , 1 T
+   cd plt/
+   change TStr, Nbase in load_csv_plt_compute_W.py
+   python load_csv_plt_compute_W.py init_path row
+
+8. compute W for all N, all T
+   cd plt
+   python load_csv_plt_compute_W_combined_N.py  init_path row
+
+###############################
+finite size scaling for M
+1. ffs for 1 beta 1 nu:
+   python load_csv_plt_rescaled_all.py init_path row
+2. compare different beta and nu:
+   python load_csv_plt_scan_beta_nu_for_M.py init_path row
