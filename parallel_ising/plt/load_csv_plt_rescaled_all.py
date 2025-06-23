@@ -36,7 +36,7 @@ def load_T_M_for_one_N(N):
     M_to_plot=MValsAll[TInds]
     return TToPlt, M_to_plot
 
-NVec=[10,20,30,40]
+NVec=[5,10,20,30,40,50,60,70,80,90]
 
 T_vecs_all=[]#corresponding to each N
 M_vec_all=[]#corresponding to each N
@@ -77,4 +77,18 @@ plt.ylabel(r"$M N^{\frac{\beta}{\nu}}$")
 plt.legend(loc="best")
 outDir=f"../dataAll/row{row}/"
 plt.savefig(outDir+"/M_rescale.png")
+plt.close()
+
+plt.figure()
+for ind,N in enumerate(NVec):
+    print(f"ind={ind}, N={N}")
+    TToPlt_one_N=T_vecs_all[ind]
+    M_to_plot_one_N=M_vec_all[ind]
+    plt.scatter(TToPlt_one_N,M_to_plot_one_N,label=f"N={N}")
+
+plt.xlabel(r"$T$")
+plt.ylabel(r"$M$")
+plt.legend(loc="best")
+outDir=f"../dataAll/row{row}/"
+plt.savefig(outDir+"/M_compare.png")
 plt.close()

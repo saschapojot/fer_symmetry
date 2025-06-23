@@ -39,7 +39,7 @@ def load_T_M_for_one_N(N):
     M_to_plot=MValsAll[TInds]
     return TToPlt, M_to_plot
 
-NVec=[10,20,30,40]
+NVec=[5,10,20,30,40,50,60,70,80,90]
 T_vecs_all=[]#corresponding to each N
 M_vec_all=[]#corresponding to each N
 
@@ -60,7 +60,7 @@ def T_M_to_rescaled(TToPlt_one_N,M_to_plot_one_N,N,beta,nu):
     return M_rescaled_one_N,tau_one_N
 
 # Set the Q value (grid size)
-Q = 35  # Change this to 5, 10, 20, etc. as needed
+Q = 25  # Change this to 5, 10, 20, etc. as needed
 beta_values=np.linspace(0.08,0.13,Q)
 nu_values=np.linspace(0.5,2,Q)
 # Adaptive figure sizing function
@@ -100,7 +100,7 @@ for i, beta in enumerate(beta_values):
         # Plot rescaled data for each N
         for idx, N in enumerate(NVec):
             M_rescaled, tau = T_M_to_rescaled(T_vecs_all[idx], M_vec_all[idx], N, beta, nu)
-            ax.scatter(tau, M_rescaled, s=10, c=colors[idx], label=f'N={N}')
+            ax.scatter(tau, M_rescaled, s=0.5, label=f'N={N}')
 
 
         ax.text(0.05, 0.95, f'β={beta:.4f}, ν={nu:.4f}', transform=ax.transAxes,
@@ -108,9 +108,9 @@ for i, beta in enumerate(beta_values):
 
         ax.tick_params(axis='both', which='major', labelsize=7)  # Larger tick labels
         ax.grid(True, alpha=0.3)
-        # Add legend to the first plot only
-        if i == 0 and j == 0:
-            ax.legend()
+        # # Add legend to the first plot only
+        # if i == 0 and j == 0:
+        #     ax.legend(ncol=3, fontsize=8, loc='upper center', bbox_to_anchor=(0.5, -0.15))
         print(f"plotted ({i}, {j})")
 
 t_plt_end=datetime.now()
@@ -120,10 +120,23 @@ fig.text(0.5, 0.04, r'Rescaled Temperature: (T-Tc)/Tc $\cdot N^{\frac{1}{\nu}}$'
 fig.text(0.04, 0.5, r'Rescaled Magnetization: M $\cdot N^{\frac{\beta}{\nu}}$', va='center', rotation='vertical', fontsize=14)
 fig.suptitle(r'Finite-Size Scaling: Data Collapse for Different $\beta$ and $\nu$ Values', fontsize=16)
 
-# Save the figure
-# timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-plt.savefig(f'fss_matrix_plot_init{init_path}_row{row}.png', dpi=300, bbox_inches='tight')
+# ADD THESE LINES for the external legend
+# Get handles and labels from any subplot (they all have the same labels)
+handles, labels = axes[0, 0].get_legend_handles_labels()
 
+# Place legend to the right of the figure
+fig.legend(handles, labels,
+           loc='center left',           # Position anchor point
+           bbox_to_anchor=(1.02, 0.5),  # (x, y) coordinates relative to figure
+           fontsize=10,                 # Make font readable
+           title="System Size",         # Add a title to the legend
+           title_fontsize=12)           # Set title font size
+
+# Adjust layout to make room for the legend
+plt.subplots_adjust(right=0.92)  # Reduce right margin to make space for legend
+
+# Save the figure (use bbox_inches='tight' to ensure legend is included)
+plt.savefig(f'fss_matrix_plot_init{init_path}_row{row}.png', dpi=300, bbox_inches='tight')
 outDir=f"../dataAll/row{row}/"
-plt.savefig(outDir+f"/M_rescale_beta_nu_all_Q{Q}.png")
+plt.savefig(outDir+f"/M_rescale_beta_nu_all_Q{Q}.png", bbox_inches='tight')
 plt.close()
